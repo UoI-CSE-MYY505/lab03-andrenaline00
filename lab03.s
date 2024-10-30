@@ -100,7 +100,31 @@ outShowRowLoop:
 rgb888_to_rgb565:
 # ----------------------------------------
 # Write your code here.
-# You may move the "return" instruction (jalr zero, ra, 0).
-    jalr zero, ra, 0
+    add t0,zero,zero #row counter , t0=0
+    
+    row: 
+        bge t0,a2,outRow #if t0>=a2 ektos
+        add t1,zero,zero #column counter t1=0
+    column:
+        bge t1,a1,outColumn #if t1>=a1 ektos
+        lhu t2,0(a0) #load half word of the current element to t2
+        srli t3,t2,0 #extract red
+        andi t3,t3,0xf8 #clear 2 lsbs
+        sb t3,0(a3) #store in out image
+        srli t3,t2,3 #extract green (2 lsbs still from blue)
+        andi t3,t3,0xfc #store in out image
+        slli t3,t2,3
+        andi t3,t3,0xf8 #clear 3lsbs
+        sb t3,3(a3) #store in out image
+        addi a0,a0,2 #mone input pointer to next pixel
+        addi a3,a3,3 #move output pointer to next pixel
+        addi t1,t1,1
+        j column
+    outColumn:
+        addi t0,t0,1 #t0++ increment row counter
+        j row #jumo to check row
+    outRow:
+        jalr zero,ra,0 #return reg
+    
 
 
